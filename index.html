@@ -700,12 +700,12 @@ header, .card, .metric-card, .calc, .cash-calc {
 <div class="subtitle">بواسطة – أيمن أبو ورده</div>
 <div class="phone">📞 0570707121</div>
 </div>
-<div class="user-controls"><button id="themeToggle" class="btn btn-blue" title="الوضع الليلي">🌙</button>
-<button class="btn btn-blue" id="newRowBtn" title="إنشاء صف جديد">➕ صف جديد</button>
+<div class="user-controls"><button class="btn btn-blue" id="newRowBtn" title="إنشاء صف جديد">➕ صف جديد</button>
+<button id="themeToggle" class="btn btn-blue" title="الوضع الليلي">🌙</button>
+<button class="btn btn-gold" id="updateVersionBtn" style="display:none;" title="تحديث الإصدار">🔄 تحديث الإصدار</button>
 <button class="btn btn-gold" id="exportBtn" title="تصدير Excel">📤 تصدير تقفيلات الشفتات (Excel)</button>
 <button class="btn btn-blue" id="printBtn" title="طباعة مباشرة">🖨️ طباعة مباشرة (A4)</button>
 <button id="logoutBtn"><span>🔒 الحفظ وتسجيل الخروج</span></button>
-<div>
 <div class="user-pill" id="userName"><span id="userStatus" style="margin-right:6px;">🟢 نشط الآن</span> المستخدم الحالي: لم يتم تحديد الموظف</div>
 <div class="last-update" id="lastUpdate">🕓 آخر تحديث: — <span id="serverStatus" style="margin-left:8px;font-weight:800;color:#9fd6ff">🔄 تحقق الخادم...</span></div>
 </div>
@@ -3747,6 +3747,7 @@ setInterval(cleanAllNumeric, 400);
   <div class="row">
     <label>أدخل GitHub Token (يُخزن محليًا فقط)</label><br>
     <input id="uploaderToken" type="password" style="width:100%" placeholder="ghp_xxx..." />
+<label style="display:flex; align-items:center; gap:6px; margin-top:8px;"><input type="checkbox" id="rememberToken"><span>حفظ التوكن (يُخزن محليًا فقط)</span></label>
     <div class="hint">لا تشارك التوكن مع أي شخص. يُخزن في المتصفح فقط.</div>
   </div>
   <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px">
@@ -3840,6 +3841,32 @@ setInterval(cleanAllNumeric, 400);
   });
 
 })();
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const tokenInput=document.getElementById("uploaderToken");
+ const remember=document.getElementById("rememberToken");
+ if(!tokenInput||!remember)return;
+ const saved=localStorage.getItem("github_token");
+ if(saved){
+   tokenInput.value=saved;
+   remember.checked=true;
+ }
+ remember.addEventListener("change",()=>{
+   if(remember.checked && tokenInput.value.trim()!==""){
+     localStorage.setItem("github_token", tokenInput.value.trim());
+   } else {
+     localStorage.removeItem("github_token");
+   }
+ });
+ tokenInput.addEventListener("input",()=>{
+   if(remember.checked){
+     localStorage.setItem("github_token", tokenInput.value.trim());
+   }
+ });
+});
 </script>
 
 </body>
