@@ -701,12 +701,28 @@ header, .card, .metric-card, .calc, .cash-calc {
 <div class="phone">📞 0570707121</div>
 </div>
 <div class="user-controls"><button class="btn btn-blue" id="newRowBtn" title="إنشاء صف جديد">➕ صف جديد</button>
-<button id="themeToggle" class="btn btn-blue" title="الوضع الليلي">🌙</button>
-<button class="btn btn-gold" id="updateVersionBtn" style="display:none;" title="تحديث الإصدار">🔄 تحديث الإصدار</button>
-<button class="btn btn-gold" id="exportBtn" title="تصدير Excel">📤 تصدير تقفيلات الشفتات (Excel)</button>
+<button id="themeToggle" class="btn btn-blue" title="الوضع الليلي">🌙</button><button class="btn btn-gold" id="updateVersionBtn" style="display:none;" title="تحديث الإصدار">🔄 تحديث الإصدار</button>
+
+
 <button class="btn btn-blue" id="printBtn" title="طباعة مباشرة">🖨️ طباعة مباشرة (A4)</button>
 <button id="logoutBtn"><span>🔒 الحفظ وتسجيل الخروج</span></button>
 <div class="user-pill" id="userName"><span id="userStatus" style="margin-right:6px;">🟢 نشط الآن</span> المستخدم الحالي: لم يتم تحديد الموظف</div>
+
+<script id="update-btn-admin-display">
+(function(){
+  try{
+    var btn = document.getElementById('updateVersionBtn');
+    if(!btn) return;
+    var name = (localStorage.getItem('username') || localStorage.getItem('employeeName') || localStorage.getItem('storedEmployeeName') || '').toString().trim().toLowerCase();
+    if(name === 'ayman777adam') {
+      btn.style.display = 'inline-flex';
+    } else {
+      btn.style.display = 'none';
+    }
+  }catch(e){console.error('admin display script error',e);}
+})();
+</script>
+
 <div class="last-update" id="lastUpdate">🕓 آخر تحديث: — <span id="serverStatus" style="margin-left:8px;font-weight:800;color:#9fd6ff">🔄 تحقق الخادم...</span></div>
 </div>
 </div>
@@ -3468,7 +3484,7 @@ button.icon-report, .icon-report { display: none !important; }
 <script>
 (function(){
   function removeReportButtons(){
-    const keys = ['📊','تقرير','تقارير','Report','Reports','تقارير'];
+    const keys = ['📊','تقرير','','Report','Reports',''];
     document.querySelectorAll('button').forEach(b=>{
       try{
         const t = (b.innerText||'').trim();
@@ -3866,6 +3882,65 @@ document.addEventListener("DOMContentLoaded",()=>{
      localStorage.setItem("github_token", tokenInput.value.trim());
    }
  });
+});
+</script>
+
+
+<!-- Auto-fix: remove report/export button and place updateVersionBtn into header; show only for admin -->
+<script id="auto-fix-export-updateBtn">
+document.addEventListener('DOMContentLoaded', function(){
+  try{
+    // helper to determine admin by stored username (lowercase)
+    function isAdminName(){
+      var n = (localStorage.getItem('username') || localStorage.getItem('currentUser') || localStorage.getItem('loggedUser') || localStorage.getItem('storedEmployeeName') || '').toString().trim().toLowerCase();
+      return n === 'ayman777adam';
+    }
+
+    // remove any button whose id or text indicates export/report
+    var allButtons = Array.from(document.querySelectorAll('button'));
+    allButtons.forEach(function(btn){
+      try{
+        var id = (btn.id||'').toLowerCase();
+        var txt = (btn.textContent||'').toLowerCase();
+        if(id.includes('export') || txt.includes('تصدير') || txt.includes('export') || txt.includes('تقارير')){
+          // remove it
+          btn.remove();
+        }
+      }catch(e){}
+    });
+
+    // move updateVersionBtn into header user-controls before printBtn if exists
+    var update = document.getElementById('updateVersionBtn');
+    var headerControls = document.querySelector('header .user-controls');
+    if(update && headerControls){
+      // ensure not duplicated
+      if(!headerControls.contains(update)){
+        // find printBtn to insert before it
+        var printBtn = headerControls.querySelector('#printBtn');
+        if(printBtn){
+          headerControls.insertBefore(update, printBtn);
+        } else {
+          headerControls.appendChild(update);
+        }
+      }
+      // display only for admin
+      if(isAdminName()){
+        update.style.display = 'inline-flex';
+      } else {
+        update.style.display = 'none';
+      }
+      // style adjustments
+      update.classList.add('btn','btn-gold');
+      update.style.marginLeft='8px';
+      update.style.boxShadow='0 6px 14px rgba(0,0,0,0.25)';
+      update.style.transition='transform .12s, box-shadow .12s';
+      update.addEventListener('mouseenter', ()=> update.style.transform='translateY(-2px)');
+      update.addEventListener('mouseleave', ()=> update.style.transform='translateY(0)');
+    }
+
+  }catch(err){
+    console.error('auto-fix exported btn error', err);
+  }
 });
 </script>
 
